@@ -1,0 +1,17 @@
+<h3>Bienvenido</h3>
+
+<%= form_for(:user, url: sessions_path) do |f| %>
+	<div class="field">
+		<%= f.label :username %><br/>
+		<%= f.text_field :username %><br/>
+	</div>
+	<div class="field">
+		<%= f.label :password%><br/>
+		<%= f.password_field :password%>
+	</div>
+	<p id="alert"><%= alert %></p>
+	<div class="actions">
+		<%= f.submit "Iniciar sesion" %>
+	</div>
+<% end %>
+<%= link_to "Crea una cuenta", new_user_path %>
