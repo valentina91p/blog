@@ -1,5 +1,5 @@
 class Post < ActiveRecord::Base
-  belongs_to :autor, class_name: "User"
+  belongs_to :author, class_name: "User"
   has_many :comments
-  validates :titulo, :contenido, presence: true
+  validates :title, :content, presence: true
 end

@@ -1,16 +1,18 @@
 class CommentsController < ApplicationController
   	before_action :set_post
-  	skip_before_action :ensure_login, only: [:create]
+  	#skip_before_action :ensure_login, only: [:create]
+  	def index
+	    @comments = @post.comments.includes(:author)
+	    render json: @comments, :include => {:author => {:only => :username}}
+	end
+
   	def create
-	    @comentario = @post.comments.new comment_params
-	    if logged_in?
-	      @comentario.autor = current_user
-	      @comentario.fecha = Date.current
-	    end
+
+	    @comment = @post.comments.new comment_params
 	    if @post.save
-	      redirect_to @post, notice: 'Tu comentario fue registrado.'
+	      render json: @comment, :include => {:author => {:only => :username}}
 	    else
-	      redirect_to @post, notice: 'Tu comentario no pudo ser creado.'
+	      render json: @comment.errors
 	    end
   	end
    	private
@@ -19,6 +21,6 @@ class CommentsController < ApplicationController
 	      @post = Post.find(params[:post_id])
 	    end
 	    def comment_params
-	      params.require(:comment).permit(:contenido, :anonimo)
+	      params.require(:comment).permit(:content, :anonymous)
 	    end
 end

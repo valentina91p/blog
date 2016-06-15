@@ -1,9 +1,11 @@
 Rails.application.routes.draw do
-	root to: "posts#index"
-	resources :posts
-	resources :users, only: [:new, :create]
-	resources :sessions, only: [:new, :create, :destroy]
-	get "/login" => "sessions#new", as: "login"
-  	delete "/logout" => "sessions#destroy", as: "logout"
-  	post "/crear_comentario/:post_id" => "comments#create", as: "create_comment"
+	scope '/api' do
+    	mount_devise_token_auth_for 'User', at: 'auth'
+		resources :posts, only: [:create, :index, :show] do
+			resources :comments, only: [:index,:create]
+		end
+		resources :users, only: [:create]
+		resources :sessions, only: [:create, :destroy]
+	end
+	root to: "application#index"
 end

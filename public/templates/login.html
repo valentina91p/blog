@@ -1,0 +1,20 @@
+<div ng-include src="'templates/header.html'"></div>
+<div class="row">
+	<div class="col s8 md4 lg3">
+		<form name="new_user" novalidate>
+			<h4>Welcome back!</h4>
+			<div class="row">
+				<div class="input-field col s6">
+		          <input placeholder="Username" id="email" type="email" class="validate" required ng-model="ctrl.user.email">
+		          <label for="email">Email</label>
+		        </div>
+		        <div class="input-field col s6">
+		          <input placeholder="Password" id="password" type="password" class="validate" ng-model="ctrl.user.password" required>
+		          <label for="password">Password</label>
+		        </div>
+		    </div>
+		    <div class="red-text" ng-show="error-message">Incorrect password and/or email </div>
+	        <a ng-click="ctrl.login(ctrl.user)" class="waves-effect waves-light btn">Go!</a>
+		</form>
+	</div>
+</div>

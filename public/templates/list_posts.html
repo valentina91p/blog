@@ -1,0 +1,10 @@
+<div ng-include src="'templates/header.html'"></div>
+<div class="row">
+	<div class="col s12 m8 l6">
+		<h3>Posts</h3>
+		<div ng-repeat="post in ctrl.posts">
+			<a ng-href="#/posts/{{post.id}}"><h5>{{post.title}}</h5></a>
+			<strong>Written by {{post.author.username}} | Published on {{post.created_at | date : "MM/dd/yyyy 'at' h:mma"}}</strong>
+		</div>
+	</div>
+</div>

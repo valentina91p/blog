@@ -1,0 +1,31 @@
+<div ng-include src="'templates/header.html'"></div>
+<div class="row">
+	<div class="col s12 m8">
+		<h3>{{ctrl.post.title}}</h3>
+		<strong>Written by {{ctrl.post.author.username}} | Published on {{ctrl.post.created_at | date : "MM/dd/yyyy 'at' h:mma"}}</strong>
+		<p>{{ctrl.post.content}}</p>
+		<hr>
+		<h5>Leave a comment</h5>
+		<form novalidate name="comment_form">
+			<div class="row">
+				<div class="input-field col s12">
+	          		<input placeholder="" ng-model="ctrl.comment.anonymous" id="anonymous" type="text" class="validate" required>
+	          		<label for="anonymous">Name</label>
+	        	</div>
+		        <div class="input-field col s12">
+		          <textarea id="content" ng-model="ctrl.comment.content" class="materialize-textarea" required></textarea>
+		          <label for="content">Comment</label>
+		        </div>
+		    </div>
+		    <button ng-click="ctrl.sendComment(ctrl.comment)" ng-disabled="comment_form.$invalid" class="waves-effect waves-light btn">Send comment</button>
+		</form>
+		<h5>Comments</h5>
+		<div ng-repeat="comment in ctrl.comments">
+			<h5>{{comment.author?comment.author.name:comment.anonymous}} | {{comment.created_at | date : "MM/dd/yyyy 'at' h:mma"}}</h5>
+			<p>{{comment.content}}</p>
+		</div>
+		<div ng-show="ctrl.comments.length == 0">
+			There are no comments yet.
+		</div>
+	</div>
+</div>

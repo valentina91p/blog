@@ -1,0 +1,8 @@
+<div class="right-align">
+	<span ng-show="loggeado">
+		Hello {{user.username}} | <a href="#/create_post">Create post</a> | <a href="javascript:void(0)" ng-click="parent.logout()">Sign out</a>
+	</span>
+	<span ng-show="!loggeado">
+		<a href="#/login">Login</a> | <a href="#/create_account">Sign up</a>
+	</span>
+</div>
