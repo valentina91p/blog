@@ -4,5 +4,6 @@ class User < ActiveRecord::Base
   include DeviseTokenAuth::Concerns::User
 	has_many :posts
 	has_many :comments
-	#validates :username, :password, presence: true
+	validates :username, presence: true, length: { maximum: 30 }
+	#validates :password, presence: true
 end

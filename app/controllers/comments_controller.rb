@@ -12,7 +12,7 @@ class CommentsController < ApplicationController
 	    if @post.save
 	      render json: @comment, :include => {:author => {:only => :username}}
 	    else
-	      render json: @comment.errors
+	      render json: @comment.errors, status: :unprocessable_entity
 	    end
   	end
    	private

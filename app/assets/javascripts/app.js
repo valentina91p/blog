@@ -1,9 +1,7 @@
 var app = angular.module("BlogApp", ['ngRoute','ng-token-auth','ngStorage']);
 app.config(function($routeProvider, $authProvider){
 	$authProvider.configure({
-      authProviderPaths: {
-        google: '/auth/google' 
-      }
+		omniauthWindowType: 'newWindow'
     });
 	$routeProvider.
 		when('/',{
@@ -57,7 +55,7 @@ app.factory('User', ['$auth','$localStorage','$q',function($auth,$localStorage,$
   				});
    	};
    	factory.doLoginWithProvider = function(){
-   		$auth.authenticate('google',{params: {resource_class: 'User'}}) 
+   		return $auth.authenticate('google',{params: {resource_class: 'User'}}) 
    			.then(function(resp) {
 	           console.log(resp);
 	           $localStorage._blog_user=resp;

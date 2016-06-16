@@ -9,11 +9,11 @@
 		<form novalidate name="comment_form">
 			<div class="row">
 				<div class="input-field col s12" ng-show="!parent.isLoggedIn()">
-	          		<input placeholder="" ng-model="ctrl.comment.anonymous" id="anonymous" type="text" class="validate" ng-required="!parent.isLoggedIn()">
+	          		<input placeholder="" ng-model="ctrl.comment.anonymous" id="anonymous" type="text" class="validate" ng-required="!parent.isLoggedIn()" maxlength="20">
 	          		<label for="anonymous">Name</label>
 	        	</div>
 		        <div class="input-field col s12">
-		          <textarea id="content" ng-model="ctrl.comment.content" class="materialize-textarea" required></textarea >
+		          <textarea id="content" ng-model="ctrl.comment.content" class="materialize-textarea" required></textarea maxlength="500">
 		          <label for="content" data-error="Can't send empty comment">Comment</label>
 		        </div>
 		    </div>

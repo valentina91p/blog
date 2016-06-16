@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
+	mount_devise_token_auth_for 'User', at: '/api/auth'
 	scope '/api' do
-    	mount_devise_token_auth_for 'User', at: 'auth'
 		resources :posts, only: [:create, :index, :show] do
 			resources :comments, only: [:index,:create]
 		end
