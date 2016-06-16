@@ -22,7 +22,7 @@
 		</form>
 		<h5>Comments</h5>
 		<div ng-repeat="comment in ctrl.comments">
-			<h5>{{comment.author?comment.author.name:comment.anonymous}} | {{comment.created_at | date : "MM/dd/yyyy 'at' h:mma"}}</h5>
+			<h5>{{comment.author?comment.author.username:comment.anonymous}} | {{comment.created_at | date : "MM/dd/yyyy 'at' h:mma"}}</h5>
 			<p>{{comment.content}}</p>
 		</div>
 		<div ng-show="ctrl.comments.length == 0">
