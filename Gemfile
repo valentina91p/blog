@@ -28,6 +28,8 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'angularjs-rails'
 gem 'devise_token_auth'
 gem 'omniauth','>=1.0.0'
+gem 'omniauth-google-oauth2'
+gem 'dotenv-rails', :groups => [:development, :test]
 # Use Unicorn as the app server
 # gem 'unicorn'
 

@@ -1,5 +1,10 @@
 var app = angular.module("BlogApp", ['ngRoute','ng-token-auth','ngStorage']);
-app.config(function($routeProvider){
+app.config(function($routeProvider, $authProvider){
+	$authProvider.configure({
+      authProviderPaths: {
+        google: '/auth/google' 
+      }
+    });
 	$routeProvider.
 		when('/',{
 			redirectTo: '/posts'
@@ -32,43 +37,62 @@ app.config(function($routeProvider){
 		})
 });
 
-app.factory('User', ['$auth','$localStorage',function($auth,$localStorage) {
-   var factory = {};
-   var authenticatedUser = undefined;
-   factory.getUser = function (user) {
-      if (user) {
-        return authenticatedUser = user;
-      }
-
-      if (typeof $localStorage._blog_session === 'undefined') {
-        return undefined;
-      }
-
-      return $auth.validateUser().then(function(res){
-      	return self.user = res;
-      },function(){
-      	return undefined;
-      });
-    };
-   
+app.factory('User', ['$auth','$localStorage','$q',function($auth,$localStorage,$q) {
+   	var factory = {};
+   	factory.doLogin = function(credentials){
+   		return $auth.submitLogin(credentials)
+		        .then(function(resp) {
+		           console.log(resp);
+		           $localStorage._blog_user=resp;
+		        });
+   	};
+   	factory.doLogout = function(){
+   		return  $q(function(resolve, reject) {
+    				$auth.signOut().then(function(){
+    					delete $localStorage._blog_user;
+    					resolve();
+    				}).catch(function(res){
+    					reject(res);
+    				});
+  				});
+   	};
+   	factory.doLoginWithProvider = function(){
+   		$auth.authenticate('google',{params: {resource_class: 'User'}}) 
+   			.then(function(resp) {
+	           console.log(resp);
+	           $localStorage._blog_user=resp;
+	        });
+   	};
+   	factory.invalidateSession = function(){
+   		delete $localStorage._blog_user;
+   	};
+   	factory.getUser = function () {
+      return $localStorage._blog_user;
+    };  
    return factory;
 }]); 
 
 app.controller("MainCtrl",['$location', '$auth','User',function($location, $auth,User){
 	var self = this;
-	User.getUser();
+
 	self.logout = function(){
-		$auth.signOut().then(function(resp) {
-          $location.url("/login");
-        })
-        .catch(function(resp) {
-          console.error(resp);
+		User.doLogout().then(function(resp) {
+          $location.url("login");
+        }, function(res){
+        	console.log("Could not log out",res);
         });
 	};
-	
-	self.loggeado = function(){
-		return User.getUser() == undefined;
+	self.login = function(){
+		User.doLoginWithProvider().then(function(res){
+	      	$location.url("posts");
+	      }).catch(function(res){
+	      	
+	      });
 	};
+	self.isLoggedIn = function(){
+		return User.getUser() != undefined;
+	};
+	console.log("User logged in ",self.isLoggedIn());
 }]);
 app.controller("ListPostCtrl",['$http', function($http){
 	var self = this;
@@ -109,7 +133,8 @@ app.controller("NewPostCtrl", ['$http','$location','$timeout', function($http,$l
 	self.createPost = function(post){
 		$http.post("/api/posts", {post:post}).then(function(resp){
 			self.message = "The post was saved successfully";
-			$timeout(function(){$location.url('posts')},5000);
+			self.post = {};
+			$timeout(function(){$location.url('posts')},3000);
 		},function(resp){
 			self.message = "The post was not saved.";
 			console.error(resp);
@@ -119,16 +144,11 @@ app.controller("NewPostCtrl", ['$http','$location','$timeout', function($http,$l
 app.controller("LoginCtrl",['$auth','$location','User', function($auth,$location,User){
 	var self = this;
 	self.login = function(user) {
-      $auth.submitLogin(user)
-        .then(function(resp) {
-           console.log(resp);
-           User.getUser(resp);
-          $location.url("posts");
-        })
-        .catch(function(resp) {
-           self.error_message = true;
-           console.error(resp);
-        });
+      User.doLogin(user).then(function(res){
+      	$location.url("posts");
+      }).catch(function(res){
+      	self.error_message = res.errors[0];
+      });
     };
 }]);
 app.controller("CreateAccountCtrl", ['$location','$auth', function($location,$auth){

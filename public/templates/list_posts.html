@@ -5,6 +5,8 @@
 		<div ng-repeat="post in ctrl.posts">
 			<a ng-href="#/posts/{{post.id}}"><h5>{{post.title}}</h5></a>
 			<strong>Written by {{post.author.username}} | Published on {{post.created_at | date : "MM/dd/yyyy 'at' h:mma"}}</strong>
+			<p>{{post.content | limitTo: 120}} ...</p>
 		</div>
+		<div ng-show="ctrl.posts.length == 0">There are no posts to show.</div>
 	</div>
 </div>
