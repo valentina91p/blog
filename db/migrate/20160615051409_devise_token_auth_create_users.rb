@@ -9,7 +9,7 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration
       t.string :encrypted_password, :null => false, :default => ""
 
      ## User Info
-      t.string :username
+      t.string :name
       t.string :email
 
       ## Tokens
@@ -20,8 +20,5 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration
 
     add_index :users, :email
     add_index :users, [:uid, :provider],     :unique => true
-    # add_index :users, :reset_password_token, :unique => true
-    # add_index :users, :confirmation_token,   :unique => true
-    # add_index :users, :unlock_token,         :unique => true
   end
 end
