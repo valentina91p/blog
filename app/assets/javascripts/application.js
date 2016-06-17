@@ -15,4 +15,8 @@
 //= require turbolinks
 //= require angular
 //= require angular-route
-//= require_tree .
+//= require angular-cookie.min
+//= require ng-token-auth.min
+//= require services
+//= require controllers
+//= require app

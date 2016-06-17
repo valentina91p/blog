@@ -1,16 +1,16 @@
 class CommentsController < ApplicationController
   	before_action :set_post
-  	#skip_before_action :ensure_login, only: [:create]
+
   	def index
 	    @comments = @post.comments.includes(:author)
-	    render json: @comments, :include => {:author => {:only => :username}}
+	    render json: @comments, :include => {:author => {:only => :name}}
 	end
 
   	def create
 	    @comment = @post.comments.new comment_params
 	    @comment.author = current_user
 	    if @post.save
-	      render json: @comment, :include => {:author => {:only => :username}}
+	      render json: @comment, :include => {:author => {:only => :name}}
 	    else
 	      render json: @comment.errors, status: :unprocessable_entity
 	    end
