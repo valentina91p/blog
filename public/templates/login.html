@@ -5,7 +5,7 @@
 			<h4>Welcome back!</h4>
 			<div class="row">
 				<div class="input-field col s6">
-		          <input placeholder="Username" id="email" type="email" class="validate" required ng-model="ctrl.user.email">
+		          <input placeholder="Email" id="email" type="email" class="validate" required ng-model="ctrl.user.email">
 		          <label for="email">Email</label>
 		        </div>
 		        <div class="input-field col s6">
@@ -13,8 +13,9 @@
 		          <label for="password">Password</label>
 		        </div>
 		    </div>
-		    <div class="red-text" ng-show="error-message">Incorrect password and/or email </div>
+		    <div class="red-text">{{ctrl.error_message}}</div>
 	        <a ng-click="ctrl.login(ctrl.user)" class="waves-effect waves-light btn">Go!</a>
+	        <a ng-click="parent.login()" class="red waves-effect waves-light btn">Login with Google</a>
 		</form>
 	</div>
 </div>

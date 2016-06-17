@@ -4,7 +4,7 @@ class PostsController < ApplicationController
   # GET /posts
   # GET /posts.json
   def index
-    @posts = Post.includes(:author)
+    @posts = Post.includes(:author).order(created_at: :desc)
     render json: @posts, :include => {:author => {:only => :username}}
   end
 

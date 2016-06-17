@@ -8,20 +8,21 @@
 		<h5>Leave a comment</h5>
 		<form novalidate name="comment_form">
 			<div class="row">
-				<div class="input-field col s12">
-	          		<input placeholder="" ng-model="ctrl.comment.anonymous" id="anonymous" type="text" class="validate" required>
+				<div class="input-field col s12" ng-show="!parent.isLoggedIn()">
+	          		<input placeholder="" ng-model="ctrl.comment.anonymous" id="anonymous" type="text" class="validate" ng-required="!parent.isLoggedIn()" maxlength="20">
 	          		<label for="anonymous">Name</label>
 	        	</div>
 		        <div class="input-field col s12">
-		          <textarea id="content" ng-model="ctrl.comment.content" class="materialize-textarea" required></textarea>
-		          <label for="content">Comment</label>
+		          <textarea id="content" ng-model="ctrl.comment.content" class="materialize-textarea" required></textarea maxlength="500">
+		          <label for="content" data-error="Can't send empty comment">Comment</label>
 		        </div>
 		    </div>
+		    <div class="red-text" ng-show="comment_form.$invalid && comment_form.$dirty">All fields are mandatory</div>
 		    <button ng-click="ctrl.sendComment(ctrl.comment)" ng-disabled="comment_form.$invalid" class="waves-effect waves-light btn">Send comment</button>
 		</form>
 		<h5>Comments</h5>
 		<div ng-repeat="comment in ctrl.comments">
-			<h5>{{comment.author?comment.author.name:comment.anonymous}} | {{comment.created_at | date : "MM/dd/yyyy 'at' h:mma"}}</h5>
+			<h5>{{comment.author?comment.author.username:comment.anonymous}} | {{comment.created_at | date : "MM/dd/yyyy 'at' h:mma"}}</h5>
 			<p>{{comment.content}}</p>
 		</div>
 		<div ng-show="ctrl.comments.length == 0">

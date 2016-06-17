@@ -1,5 +1,8 @@
 var app = angular.module("BlogApp", ['ngRoute','ng-token-auth','ngStorage']);
-app.config(function($routeProvider){
+app.config(function($routeProvider, $authProvider){
+	$authProvider.configure({
+		omniauthWindowType: 'newWindow'
+    });
 	$routeProvider.
 		when('/',{
 			redirectTo: '/posts'
@@ -32,45 +35,62 @@ app.config(function($routeProvider){
 		})
 });
 
-app.factory('User', ['$auth',function($auth) {
-	var factory = {};
-	var authenticatedUser = undefined;
-	factory.setUser = function(user){
-	   	authenticatedUser = user;
-	};
-   	factory.getUser = function (user) {
-    	return authenticatedUser;  
-    };
-	factory.isSignIn = function(){
-		return authenticatedUser != undefined;
-	};
-   
+app.factory('User', ['$auth','$localStorage','$q',function($auth,$localStorage,$q) {
+   	var factory = {};
+   	factory.doLogin = function(credentials){
+   		return $auth.submitLogin(credentials)
+		        .then(function(resp) {
+		           console.log(resp);
+		           $localStorage._blog_user=resp;
+		        });
+   	};
+   	factory.doLogout = function(){
+   		return  $q(function(resolve, reject) {
+    				$auth.signOut().then(function(){
+    					delete $localStorage._blog_user;
+    					resolve();
+    				}).catch(function(res){
+    					reject(res);
+    				});
+  				});
+   	};
+   	factory.doLoginWithProvider = function(){
+   		return $auth.authenticate('google',{params: {resource_class: 'User'}}) 
+   			.then(function(resp) {
+	           console.log(resp);
+	           $localStorage._blog_user=resp;
+	        });
+   	};
+   	factory.invalidateSession = function(){
+   		delete $localStorage._blog_user;
+   	};
+   	factory.getUser = function () {
+      return $localStorage._blog_user;
+    };  
    return factory;
 }]); 
 
 app.controller("MainCtrl",['$location', '$auth','User','$rootScope',function($location, $auth,User,$rootScope){
 	var self = this;
 	self.logout = function(){
-		$auth.signOut().then(function(resp) {
-          $location.url("/login");
-        })
-        .catch(function(resp) {
-          console.error(resp);
+		User.doLogout().then(function(resp) {
+          $location.url("login");
+        }, function(res){
+        	console.log("Could not log out",res);
         });
 	};
-	
-	self.loggeado = function(){
-		return User.isSignIn();
+	self.login = function(){
+		User.doLoginWithProvider().then(function(res){
+	      	$location.url("posts");
+	      }).catch(function(res){
+	      	
+	      });
 	};
-
-	$rootScope.$on('auth:login-success',function(ev, user){
-		User.setUser(user);
-		self.user = user;
-	});
-	$rootScope.$on('auth:logout-success',function(ev, user){
-		User.setUser(undefined);
-	});
+	self.isLoggedIn = function(){
+		return User.getUser() != undefined;
+	};
 }]);
+
 app.controller("ListPostCtrl",['$http', function($http){
 	var self = this;
 	init();
@@ -110,7 +130,8 @@ app.controller("NewPostCtrl", ['$http','$location','$timeout', function($http,$l
 	self.createPost = function(post){
 		$http.post("/api/posts", {post:post}).then(function(resp){
 			self.message = "The post was saved successfully";
-			$timeout(function(){$location.url('posts')},5000);
+			self.post = {};
+			$timeout(function(){$location.url('posts')},3000);
 		},function(resp){
 			self.message = "The post was not saved.";
 			console.error(resp);
@@ -120,16 +141,11 @@ app.controller("NewPostCtrl", ['$http','$location','$timeout', function($http,$l
 app.controller("LoginCtrl",['$auth','$location','User', function($auth,$location,User){
 	var self = this;
 	self.login = function(user) {
-      $auth.submitLogin(user)
-        .then(function(resp) {
-           console.log(resp);
-           User.getUser(resp);
-          $location.url("posts");
-        })
-        .catch(function(resp) {
-           self.error_message = true;
-           console.error(resp);
-        });
+      User.doLogin(user).then(function(res){
+      	$location.url("posts");
+      }).catch(function(res){
+      	self.error_message = res.errors[0];
+      });
     };
 }]);
 app.controller("CreateAccountCtrl", ['$location','$auth', function($location,$auth){

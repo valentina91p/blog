@@ -7,12 +7,12 @@ class CommentsController < ApplicationController
 	end
 
   	def create
-
 	    @comment = @post.comments.new comment_params
+	    @comment.author = current_user
 	    if @post.save
 	      render json: @comment, :include => {:author => {:only => :username}}
 	    else
-	      render json: @comment.errors
+	      render json: @comment.errors, status: :unprocessable_entity
 	    end
   	end
    	private
