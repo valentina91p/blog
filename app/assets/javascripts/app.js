@@ -32,31 +32,24 @@ app.config(function($routeProvider){
 		})
 });
 
-app.factory('User', ['$auth','$localStorage',function($auth,$localStorage) {
-   var factory = {};
-   var authenticatedUser = undefined;
-   factory.getUser = function (user) {
-      if (user) {
-        return authenticatedUser = user;
-      }
-
-      if (typeof $localStorage._blog_session === 'undefined') {
-        return undefined;
-      }
-
-      return $auth.validateUser().then(function(res){
-      	return self.user = res;
-      },function(){
-      	return undefined;
-      });
+app.factory('User', ['$auth',function($auth) {
+	var factory = {};
+	var authenticatedUser = undefined;
+	factory.setUser = function(user){
+	   	authenticatedUser = user;
+	};
+   	factory.getUser = function (user) {
+    	return authenticatedUser;  
     };
+	factory.isSignIn = function(){
+		return authenticatedUser != undefined;
+	};
    
    return factory;
 }]); 
 
-app.controller("MainCtrl",['$location', '$auth','User',function($location, $auth,User){
+app.controller("MainCtrl",['$location', '$auth','User','$rootScope',function($location, $auth,User,$rootScope){
 	var self = this;
-	User.getUser();
 	self.logout = function(){
 		$auth.signOut().then(function(resp) {
           $location.url("/login");
@@ -67,8 +60,16 @@ app.controller("MainCtrl",['$location', '$auth','User',function($location, $auth
 	};
 	
 	self.loggeado = function(){
-		return User.getUser() == undefined;
+		return User.isSignIn();
 	};
+
+	$rootScope.$on('auth:login-success',function(ev, user){
+		User.setUser(user);
+		self.user = user;
+	});
+	$rootScope.$on('auth:logout-success',function(ev, user){
+		User.setUser(undefined);
+	});
 }]);
 app.controller("ListPostCtrl",['$http', function($http){
 	var self = this;
